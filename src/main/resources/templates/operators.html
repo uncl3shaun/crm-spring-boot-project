@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Operators</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="mt-4">Управление операторами</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Добавить оператора
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/add-operator}" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Имя:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="surname" class="form-label">Фамилия:</label>
+                            <input type="text" class="form-control" id="surname" name="surname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Отдел:</label>
+                            <select class="form-select" id="department" name="department">
+                                <option value="IT">IT</option>
+                                <option value="Sales">sales</option>
+                                <option value="Marketing">Marketing</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    Список операторов
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Фамилия</th>
+                            <th>Отдел</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="op : ${operators}">
+                            <td th:text="${op.id}"></td>
+                            <td th:text="${op.name}"></td>
+                            <td th:text="${op.surname}"></td>
+                            <td th:text="${op.department}"></td>
+                        </tr>
+                        <tr th:if="${operators.isEmpty()}">
+                            <td colspan="4" class="text-center">Операторы не найдены</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Details</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="mt-4">Детали Заявки</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${request.userName}">User Name</h5>
+            <p class="card-text"><strong>Телефон:</strong> <span th:text="${request.phone}"></span></p>
+            <p class="card-text"><strong>Курс:</strong> <span th:text="${request.course.name}"></span></p>
+            <p class="card-text"><strong>Комментарий:</strong> <span th:text="${request.commentary}"></span></p>
+            <p class="card-text">
+                <strong>Статус:</strong>
+                <span th:if="${request.handled}" class="badge bg-success">Обработана</span>
+                <span th:unless="${request.handled}" class="badge bg-danger">Новая</span>
+            </p>
+
+            <div class="mt-3">
+                <a th:if="${!request.handled}" 
+                   th:href="@{/details/{id}/assign(id=${request.id})}" 
+                   class="btn btn-primary me-2">
+                    Обработать заявку
+                </a>
+                
+                <button type="button" class="btn btn-danger" 
+                        th:onclick="|if(confirm('Вы уверены?')) document.getElementById('deleteForm').submit();|">
+                    Удалить заявку
+                </button>
+
+                <form th:action="@{/delete-request/{id}(id=${request.id})}" 
+                      method="post" id="deleteForm" style="display: none;"></form>
+            </div>
+            
+            <div th:if="${request.handled}" class="mt-4">
+                <h5>Назначенные операторы:</h5>
+                <div th:if="${request.operators.isEmpty()}">
+                    <p>Нет назначенных операторов.</p>
+                </div>
+                <ul class="list-group" th:unless="${request.operators.isEmpty()}">
+                    <li th:each="operator : ${request.operators}" class="list-group-item d-flex justify-content-between align-items-center">
+                        <span th:text="${operator.name + ' ' + operator.surname + ' (' + operator.department + ')'}"></span>
+                        <form th:action="@{/details/{requestId}/unassign/{operatorId}(requestId=${request.id}, operatorId=${operator.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-danger">Удалить</F_button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            </div>
+    </div>
+    <a href="/" class="btn btn-secondary mt-3">Назад к списку</a>
+</div>
+</body>
+</html>

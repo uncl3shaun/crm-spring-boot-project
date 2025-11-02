@@ -1,0 +1,14 @@
+# Build files
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Log files
+*.log
+
+# Dependency directories
+node_modules/

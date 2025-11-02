@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Добавить заявку</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">Добавить новую заявку</h1>
+            
+            <form th:action="@{/save-request}" th:object="${request}" method="post">
+                <div class="mb-3">
+                    <label for="userName" class="form-label">ФИО:</label>
+                    <input type="text" class="form-control" id="userName" th:field="*{userName}" placeholder="ФИО:" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="course" class="form-label">Курс:</label>
+                    <select class="form-select" id="course" th:field="*{course}" required>
+                        <option value="" disabled selected>Выберите курс</option>
+                        <option th:each="course : ${courses}"
+                                th:value="${course.id}"
+                                th:text="${course.name + ' - ' + course.price + ' KZT'}">
+                        </option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Телефон:</label>
+                    <input type="tel" class="form-control" id="phone" th:field="*{phone}" placeholder="+7(777) 777-77-77" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="commentary" class="form-label">Комментария:</label>
+                    <textarea class="form-control" id="commentary" rows="4" th:field="*{commentary}" placeholder="Комментария"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">Добавить заявку</button>
+                <a th:href="@{/}" class="btn btn-secondary">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
