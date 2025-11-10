@@ -1,5 +1,4 @@
 package com.example.crmapp.service;
-
 import com.example.crmapp.exception.ResourceNotFoundException;
 import com.example.crmapp.model.Courses;
 import com.example.crmapp.repository.CoursesRepository;

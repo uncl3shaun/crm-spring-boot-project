@@ -31,8 +31,6 @@ public class ApplicationRequest {
     @JoinColumn(name = "course_id")
     private Courses course;
 
-    // NOTE: This creates the join table "requests_operators"
-    // to link requests with the operators assigned to them.
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "requests_operators",

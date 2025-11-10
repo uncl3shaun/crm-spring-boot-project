@@ -1,5 +1,4 @@
 package com.example.crmapp.service;
-
 import com.example.crmapp.exception.ResourceNotFoundException;
 import com.example.crmapp.model.ApplicationRequest;
 import com.example.crmapp.model.Courses;
@@ -9,7 +8,6 @@ import com.example.crmapp.repository.CoursesRepository;
 import com.example.crmapp.repository.OperatorsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 

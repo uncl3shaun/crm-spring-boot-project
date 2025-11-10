@@ -138,21 +138,6 @@ public class RequestController {
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\dto\ApplicationRequestDTO.java:
-"package com.example.crmapp.dto;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class ApplicationRequestDTO {
-    private String userName;
-    private Long courseId; // <- Ключевое отличие от Entity
-    private String commentary;
-    private String phone;
-}"
-
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\exception\GlobalExceptionHandler.java:
 "package com.example.crmapp.exception;
 
@@ -167,6 +152,8 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    //TODO: Maybe add a more specific handler for database constraint violations later
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(
@@ -235,7 +222,8 @@ public class ApplicationRequest {
     @JoinColumn(name = "course_id")
     private Courses course;
 
-
+    // NOTE: This creates the join table "requests_operators"
+    // to link requests with the operators assigned to them.
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "requests_operators",
@@ -356,7 +344,6 @@ public interface OperatorsRepository extends JpaRepository<Operators, Long> {
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\ApplicationRequestController.java:
 "package com.example.crmapp.rest;
 
-import com.example.crmapp.dto.ApplicationRequestDTO;
 import com.example.crmapp.model.ApplicationRequest;
 import com.example.crmapp.service.ApplicationRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -387,8 +374,8 @@ public class ApplicationRequestController {
 
 
     @PostMapping
-    public ResponseEntity<ApplicationRequest> addRequest(@RequestBody ApplicationRequestDTO requestDTO) {
-        ApplicationRequest newRequest = requestService.addRequest(requestDTO);
+    public ResponseEntity<ApplicationRequest> addRequest(@RequestBody ApplicationRequest request) {
+        ApplicationRequest newRequest = requestService.createRequest(request);
         return new ResponseEntity<>(newRequest, HttpStatus.CREATED);
     }
 
@@ -419,6 +406,7 @@ public class ApplicationRequestController {
             @PathVariable Long operatorId) {
         return requestService.unassignOperatorFromRequest(requestId, operatorId);
     }
+
 }"
 
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\CoursesController.java:
@@ -499,7 +487,6 @@ public class OperatorsController {
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\ApplicationRequestService.java:
 "package com.example.crmapp.service;
 
-import com.example.crmapp.dto.ApplicationRequestDTO;
 import com.example.crmapp.exception.ResourceNotFoundException;
 import com.example.crmapp.model.ApplicationRequest;
 import com.example.crmapp.model.Courses;
@@ -577,20 +564,7 @@ public class ApplicationRequestService {
     }
 
 
-    public ApplicationRequest addRequest(ApplicationRequestDTO requestDTO) {
-        Courses course = coursesRepository.findById(requestDTO.getCourseId())
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + requestDTO.getCourseId()));
 
-        ApplicationRequest newRequest = new ApplicationRequest();
-        newRequest.setUserName(requestDTO.getUserName());
-        newRequest.setCommentary(requestDTO.getCommentary());
-        newRequest.setPhone(requestDTO.getPhone());
-        newRequest.setHandled(false);
-        newRequest.setCourse(course);
-        newRequest.setOperators(new ArrayList<>());
-
-        return repository.save(newRequest);
-    }
 
     public ApplicationRequest updateRequestStatus(Long id, boolean handled) {
 
@@ -995,7 +969,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\operators.html:
                             <label for="department" class="form-label">Отдел:</label>
                             <select class="form-select" id="department" name="department">
                                 <option value="IT">IT</option>
-                                <option value="Praja">Praja</option>
+                                <option value="Sales">sales</option>
                                 <option value="Marketing">Marketing</option>
                             </select>
                         </div>
