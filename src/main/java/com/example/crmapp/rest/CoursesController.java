@@ -1,6 +1,6 @@
 package com.example.crmapp.rest;
 
-import com.example.crmapp.model.Courses;
+import com.example.crmapp.dto.CourseDto;
 import com.example.crmapp.service.CoursesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,23 +16,30 @@ public class CoursesController {
     @Autowired
     private CoursesService coursesService;
 
-
     @GetMapping
-    public List<Courses> getAllCourses() {
-        return coursesService.getAllCourses();
+    public ResponseEntity<List<CourseDto>> getAllCourses() {
+        return ResponseEntity.ok(coursesService.getAllCourses());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseDto> getCourse(@PathVariable Long id) {
+        return ResponseEntity.ok(coursesService.getCourseById(id));
+    }
 
     @PostMapping
-    public ResponseEntity<Courses> addCourse(@RequestBody Courses course) {
-        Courses newCourse = coursesService.addCourse(course);
-        return new ResponseEntity<>(newCourse, HttpStatus.CREATED);
+    public ResponseEntity<CourseDto> addCourse(@RequestBody CourseDto courseDto) {
+        return new ResponseEntity<>(coursesService.addCourse(courseDto), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CourseDto> updateCourse(@PathVariable Long id,
+                                                  @RequestBody CourseDto courseDto) {
+        return ResponseEntity.ok(coursesService.updateCourse(id, courseDto));
+    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         coursesService.deleteCourse(id);
-        return ResponseEntity.ok("Course with id " + id + " was deleted");
+        return ResponseEntity.ok().build();
     }
 }

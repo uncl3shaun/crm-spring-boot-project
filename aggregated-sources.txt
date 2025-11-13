@@ -222,8 +222,6 @@ public class ApplicationRequest {
     @JoinColumn(name = "course_id")
     private Courses course;
 
-    // NOTE: This creates the join table "requests_operators"
-    // to link requests with the operators assigned to them.
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "requests_operators",
@@ -302,11 +300,9 @@ public class Operators {
 
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\ApplicationRequestRepository.java:
 "package com.example.crmapp.repository;
-
 import com.example.crmapp.model.ApplicationRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
@@ -320,7 +316,6 @@ public interface ApplicationRequestRepository extends JpaRepository<ApplicationR
 
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\CoursesRepository.java:
 "package com.example.crmapp.repository;
-
 import com.example.crmapp.model.Courses;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -332,7 +327,6 @@ public interface CoursesRepository extends JpaRepository<Courses, Long> {
 
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\OperatorsRepository.java:
 "package com.example.crmapp.repository;
-
 import com.example.crmapp.model.Operators;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -486,7 +480,6 @@ public class OperatorsController {
 
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\ApplicationRequestService.java:
 "package com.example.crmapp.service;
-
 import com.example.crmapp.exception.ResourceNotFoundException;
 import com.example.crmapp.model.ApplicationRequest;
 import com.example.crmapp.model.Courses;
@@ -496,7 +489,6 @@ import com.example.crmapp.repository.CoursesRepository;
 import com.example.crmapp.repository.OperatorsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -582,7 +574,6 @@ public class ApplicationRequestService {
 
 D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\CoursesService.java:
 "package com.example.crmapp.service;
-
 import com.example.crmapp.exception.ResourceNotFoundException;
 import com.example.crmapp.model.Courses;
 import com.example.crmapp.repository.CoursesRepository;
@@ -897,7 +888,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\layout.html:
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
     <div class="container-fluid">
         <a class="navbar-brand" th:href="@{/}">CRM Система</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
