@@ -1,5 +1,5 @@
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\CrmAppApplication.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\CrmAppApplication.java:
 "package com.example.crmapp;
 
 import org.springframework.boot.SpringApplication;
@@ -15,7 +15,7 @@ public class CrmAppApplication {
 }
 "
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\controller\RequestController.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\controller\RequestController.java:
 "package com.example.crmapp.controller;
 
 import com.example.crmapp.model.ApplicationRequest;
@@ -138,7 +138,63 @@ public class RequestController {
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\exception\GlobalExceptionHandler.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\dto\CourseCategoryDto.java:
+"package com.example.crmapp.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class CourseCategoryDto {
+    private Long id;
+    private String name;
+}"
+
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\dto\CourseDto.java:
+"package com.example.crmapp.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class CourseDto {
+    private Long id;
+    private String name;
+    private String description;
+    private int price;
+
+
+    private CourseCategoryDto category;
+
+
+    private List<TagDto> tags;
+}
+"
+
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\dto\TagDto.java:
+"package com.example.crmapp.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class TagDto {
+    private Long id;
+    private String name;
+}"
+
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\exception\GlobalExceptionHandler.java:
 "package com.example.crmapp.exception;
 
 import org.springframework.http.HttpStatus;
@@ -175,7 +231,7 @@ public class GlobalExceptionHandler {
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\exception\ResourceNotFoundException.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\exception\ResourceNotFoundException.java:
 "package com.example.crmapp.exception;
 
 import org.springframework.http.HttpStatus;
@@ -188,7 +244,30 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\ApplicationRequest.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\mapper\CourseMapper.java:
+"package com.example.crmapp.mapper;
+
+import com.example.crmapp.dto.CourseCategoryDto;
+import com.example.crmapp.dto.CourseDto;
+import com.example.crmapp.dto.TagDto;
+import com.example.crmapp.model.CourseCategory;
+import com.example.crmapp.model.Courses;
+import com.example.crmapp.model.Tag;
+import org.mapstruct.Mapper;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface CourseMapper {
+
+    CourseDto toDto(Courses course);
+
+    CourseCategoryDto toDto(CourseCategory category);
+
+    TagDto toDto(Tag tag);
+}"
+
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\ApplicationRequest.java:
 "package com.example.crmapp.model;
 
 import jakarta.persistence.*;
@@ -231,7 +310,7 @@ public class ApplicationRequest {
     private List<Operators> operators;
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\Courses.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\CourseCategory.java:
 "package com.example.crmapp.model;
 
 import jakarta.persistence.*;
@@ -239,6 +318,39 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
+
+@Entity
+@Table(name = "course_categories")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CourseCategory {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Courses> courses;
+}
+"
+
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\Courses.java:
+"package com.example.crmapp.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+import java.util.List; // <-- Import List
 
 @Entity
 //@Table(name = "courses")
@@ -260,9 +372,23 @@ public class Courses {
 
     @Column(name = "price", nullable = false)
     private int price;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private CourseCategory category;
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "courses_tags",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\Operators.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\Operators.java:
 "package com.example.crmapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -298,7 +424,35 @@ public class Operators {
     private List<ApplicationRequest> requests;
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\ApplicationRequestRepository.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\model\Tag.java:
+"package com.example.crmapp.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Entity
+@Table(name = "tags")
+@Getter
+@Setter
+public class Tag {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
+
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Courses> courses;
+}"
+
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\ApplicationRequestRepository.java:
 "package com.example.crmapp.repository;
 import com.example.crmapp.model.ApplicationRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -314,7 +468,7 @@ public interface ApplicationRequestRepository extends JpaRepository<ApplicationR
 
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\CoursesRepository.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\CoursesRepository.java:
 "package com.example.crmapp.repository;
 import com.example.crmapp.model.Courses;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -325,7 +479,7 @@ public interface CoursesRepository extends JpaRepository<Courses, Long> {
 
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\OperatorsRepository.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\repository\OperatorsRepository.java:
 "package com.example.crmapp.repository;
 import com.example.crmapp.model.Operators;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -335,7 +489,7 @@ import org.springframework.stereotype.Repository;
 public interface OperatorsRepository extends JpaRepository<Operators, Long> {
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\ApplicationRequestController.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\ApplicationRequestController.java:
 "package com.example.crmapp.rest;
 
 import com.example.crmapp.model.ApplicationRequest;
@@ -403,10 +557,10 @@ public class ApplicationRequestController {
 
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\CoursesController.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\CoursesController.java:
 "package com.example.crmapp.rest;
 
-import com.example.crmapp.model.Courses;
+import com.example.crmapp.dto.CourseDto;
 import com.example.crmapp.service.CoursesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -422,28 +576,35 @@ public class CoursesController {
     @Autowired
     private CoursesService coursesService;
 
-
     @GetMapping
-    public List<Courses> getAllCourses() {
-        return coursesService.getAllCourses();
+    public ResponseEntity<List<CourseDto>> getAllCourses() {
+        return ResponseEntity.ok(coursesService.getAllCourses());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseDto> getCourse(@PathVariable Long id) {
+        return ResponseEntity.ok(coursesService.getCourseById(id));
+    }
 
     @PostMapping
-    public ResponseEntity<Courses> addCourse(@RequestBody Courses course) {
-        Courses newCourse = coursesService.addCourse(course);
-        return new ResponseEntity<>(newCourse, HttpStatus.CREATED);
+    public ResponseEntity<CourseDto> addCourse(@RequestBody CourseDto courseDto) {
+        return new ResponseEntity<>(coursesService.addCourse(courseDto), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CourseDto> updateCourse(@PathVariable Long id,
+                                                  @RequestBody CourseDto courseDto) {
+        return ResponseEntity.ok(coursesService.updateCourse(id, courseDto));
+    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         coursesService.deleteCourse(id);
-        return ResponseEntity.ok("Course with id " + id + " was deleted");
+        return ResponseEntity.ok().build();
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\OperatorsController.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\rest\OperatorsController.java:
 "package com.example.crmapp.rest;
 
 
@@ -478,7 +639,7 @@ public class OperatorsController {
 
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\ApplicationRequestService.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\ApplicationRequestService.java:
 "package com.example.crmapp.service;
 import com.example.crmapp.exception.ResourceNotFoundException;
 import com.example.crmapp.model.ApplicationRequest;
@@ -572,15 +733,19 @@ public class ApplicationRequestService {
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\CoursesService.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\CoursesService.java:
 "package com.example.crmapp.service;
+
+import com.example.crmapp.dto.CourseDto;
 import com.example.crmapp.exception.ResourceNotFoundException;
+import com.example.crmapp.mapper.CourseMapper;
 import com.example.crmapp.model.Courses;
 import com.example.crmapp.repository.CoursesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CoursesService {
@@ -588,29 +753,58 @@ public class CoursesService {
     @Autowired
     private CoursesRepository coursesRepository;
 
-    public List<Courses> getAllCourses() {
-        return coursesRepository.findAll();
+    @Autowired
+    private CourseMapper courseMapper;
+
+    public List<CourseDto> getAllCourses() {
+        return coursesRepository.findAll().stream()
+                .map(courseMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-
-    public Courses addCourse(Courses course) {
-        return coursesRepository.save(course);
-    }
-
-    public Courses getCourseById(Long id) {
-        return coursesRepository.findById(id)
+    public CourseDto getCourseById(Long id) {
+        Courses course = coursesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
+        return courseMapper.toDto(course);
     }
 
+    public CourseDto addCourse(CourseDto courseDto) {
+        Courses course = toEntity(courseDto);
+        Courses savedCourse = coursesRepository.save(course);
+        return courseMapper.toDto(savedCourse);
+    }
+
+    public CourseDto updateCourse(Long id, CourseDto courseDto) {
+        Courses existingCourse = coursesRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
+
+        existingCourse.setName(courseDto.getName());
+        existingCourse.setDescription(courseDto.getDescription());
+        existingCourse.setPrice(courseDto.getPrice());
+
+        Courses updatedCourse = coursesRepository.save(existingCourse);
+        return courseMapper.toDto(updatedCourse);
+    }
 
     public void deleteCourse(Long id) {
-        Courses course = getCourseById(id);
-        coursesRepository.delete(course);
+        if (!coursesRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Course not found with id: " + id);
+        }
+        coursesRepository.deleteById(id);
     }
 
+
+    public Courses toEntity(CourseDto dto) {
+        Courses course = new Courses();
+        course.setId(dto.getId());
+        course.setName(dto.getName());
+        course.setDescription(dto.getDescription());
+        course.setPrice(dto.getPrice());
+        return course;
+    }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\OperatorsService.java:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\java\com\example\crmapp\service\OperatorsService.java:
 "package com.example.crmapp.service;
 
 import com.example.crmapp.exception.ResourceNotFoundException;
@@ -642,7 +836,7 @@ public class OperatorsService {
     }
 }"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\application.properties:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\application.properties:
 "
 server.port=8080
 
@@ -664,7 +858,7 @@ spring.sql.init.mode=always
 
 spring.jpa.defer-datasource-initialization=true"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\data.sql:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\data.sql:
 "
 INSERT INTO courses (name, description, price) VALUES
                                                    ('Java Standard Edition', 'Full course on Java SE from scratch.', 150000),
@@ -674,7 +868,7 @@ INSERT INTO courses (name, description, price) VALUES
                                                    ('UX/UI Design', 'From wireframes to high-fidelity prototypes.', 110000),
                                                    ('Django Framework', 'Full-stack web development with Python and Django.', 140000);"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\add-request.html:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\templates\add-request.html:
 "<!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -725,7 +919,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\add-request.html:
 </body>
 </html>"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\assign-operators.html:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\templates\assign-operators.html:
 "<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -768,7 +962,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\assign-operators.html:
 </body>
 </html>"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\details.html:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\templates\details.html:
 "<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -828,7 +1022,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\details.html:
 </body>
 </html>"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\index.html:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\templates\index.html:
 "<!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -876,7 +1070,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\index.html:
 </body>
 </html>"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\layout.html:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\templates\layout.html:
 "<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
@@ -928,7 +1122,7 @@ D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\layout.html:
 </body>
 </html>"
 
-D:\shaun\Soft_Eng_Projects\4\src\main\resources\templates\operators.html:
+D:\shaun\projects\Soft_Eng_Projects\4\src\main\resources\templates\operators.html:
 "<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
